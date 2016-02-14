@@ -1,0 +1,72 @@
+---
+- name: Install package iptables-persistent
+  apt: name=iptables-persistent
+
+# Set up netfilter
+- name: Add nf_conntrack to /etc/modules
+  lineinfile: dest=/etc/modules regexp="^nf_conntrack$" line=nf_conntrack
+
+- name: Load kernel module nf_conntrack
+  modprobe: name=nf_conntrack
+
+- name: Set sysctl netfilter parameters
+  sysctl: name={{ item.key }} value={{ item.value }} state=present reload=yes
+  with_items:
+    - { key: 'net.netfilter.nf_conntrack_tcp_timeout_established', value: '600' }
+    - { key: 'net.netfilter.nf_conntrack_max', value: '1024000' }
+    - { key: 'net.nf_conntrack_max', value: '1024000' }
+    - { key: 'net.netfilter.nf_conntrack_tcp_timeout_time_wait', value: '30' }
+
+
+# Set up IPv4
+- name: Add nf_conntrack_ipv4 to /etc/modules
+  lineinfile: dest=/etc/modules regexp="^nf_conntrack_ipv4$" line=nf_conntrack_ipv4
+
+- name: Load kernel module nf_conntrack_ipv4
+  modprobe: name=nf_conntrack_ipv4
+
+- name: Set sysctl netfilter parameters (IPv4)
+  sysctl: name={{ item.key }} value={{ item.value }} state=present reload=yes
+  with_items:
+    - { key: 'net.ipv4.tcp_ecn', value: '0' }
+    - { key: 'net.ipv4.netfilter.nf_conntrack_max', value: '1024000' }
+    - { key: 'net.ipv4.netfilter.ip_conntrack_generic_timeout', value: '120' }
+    - { key: 'net.ipv4.tcp_tw_reuse', value: '1' }
+    - { key: 'net.ipv4.conf.default.rp_filter', value: '0' }
+    - { key: 'net.ipv4.conf.all.rp_filter', value: '0' }
+    - { key: 'net.ipv4.tcp_syncookies', value: '1' }
+    - { key: 'net.ipv4.ip_forward', value: '1' }
+    - { key: 'net.ipv4.conf.all.accept_redirects ', value: '1' }
+    - { key: 'net.ipv4.conf.all.secure_redirects ', value: '1' }
+    - { key: 'net.ipv4.conf.all.send_redirects ', value: '1' }
+    - { key: 'net.ipv4.conf.all.accept_source_route ', value: '1' }
+    - { key: 'net.ipv4.conf.all.log_martians ', value: '0' }
+    - { key: 'net.ipv4.route.max_size', value: '8388608' }
+    - { key: 'net.ipv4.neigh.default.gc_thresh1 ', value: '2048' }
+    - { key: 'net.ipv4.neigh.default.gc_thresh2 ', value: '4096' }
+    - { key: 'net.ipv4.neigh.default.gc_thresh3 ', value: '8192' }
+
+
+# Set up IPv6
+- name: Add nf_conntrack_ipv6 to /etc/modules
+  lineinfile: dest=/etc/modules regexp="^nf_conntrack_ipv6$" line=nf_conntrack_ipv6
+
+- name: Load kernel module nf_conntrack_ipv6
+  modprobe: name=nf_conntrack_ipv6
+
+- name: Set sysctl netfilter parameters (IPv6)
+  sysctl: name={{ item.key }} value={{ item.value }} state=present reload=yes
+  with_items:
+    - { key: 'net.ipv6.conf.all.forwarding', value: '1' }
+    - { key: 'net.ipv6.conf.all.accept_redirects ', value: '1' }
+    - { key: 'net.ipv6.conf.all.accept_source_route ', value: '1' }
+    - { key: 'net.ipv6.conf.all.autoconf ', value: '0' }
+    - { key: 'net.ipv6.conf.default.autoconf ', value: '0' }
+    - { key: 'net.ipv6.conf.eth0.autoconf ', value: '0' }
+    - { key: 'net.ipv6.conf.all.accept_ra ', value: '0' }
+    - { key: 'net.ipv6.conf.default.accept_ra ', value: '0' }
+    - { key: 'net.ipv6.conf.eth0.accept_ra ', value: '0' }
+    - { key: 'net.ipv6.route.max_size', value: '8388608' }
+    - { key: 'net.ipv6.neigh.default.gc_thresh1 ', value: '2048' }
+    - { key: 'net.ipv6.neigh.default.gc_thresh2 ', value: '4096' }
+    - { key: 'net.ipv6.neigh.default.gc_thresh3 ', value: '8192' }

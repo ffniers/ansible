@@ -1,0 +1,17 @@
+---
+- name: Install bird
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - bird
+    - bird6
+
+- name: Create bird configuraion
+  template:
+    src: bird.conf.j2
+    dest: /etc/bird/bird.conf
+
+
+- name: Create bird6 configuraion
+  template:
+    src: bird6.conf.j2
+    dest: /etc/bird/bird6.conf

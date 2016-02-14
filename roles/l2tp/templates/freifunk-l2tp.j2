@@ -1,0 +1,18 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+{% for t in l2tp.tunnel %}
+############################################
+# L2TP tunnel "{{ t.name }}"
+############################################
+ip l2tp add tunnel tunnel_id {{ l2tp.node_id }}{{ t.id }}{{ hostvars[t.name]['l2tp']['node_id'] }} peer_tunnel_id {{ hostvars[t.name]['l2tp']['node_id'] }}{{ t.id }}{{ l2tp.node_id }} udp_sport 42{{ l2tp.node_id }}{{ t.id }}{{ hostvars[t.name]['l2tp']['node_id'] }} udp_dport 42{{ hostvars[t.name]['l2tp']['node_id'] }}{{ t.id }}{{ l2tp.node_id }} encap udp local {{ ansible_default_ipv4.address }} remote {{ hostvars[t.name]['ansible_default_ipv4']['address'] }}
+
+{% for s in t.sessions %}
+# Session '{{ s.name }}'
+ip l2tp add session name bb{{ s.name }}-{{ t.name }} tunnel_id {{ l2tp.node_id }}{{ t.id }}{{ hostvars[t.name]['l2tp']['node_id'] }} session_id {{ l2tp.node_id }}{{ s.id }}{{ hostvars[t.name]['l2tp']['node_id'] }} peer_session_id {{ hostvars[t.name]['l2tp']['node_id'] }}{{ s.id }}{{ l2tp.node_id }}
+ip link set bb{{ s.name }}-{{ t.name }} up mtu 1488
+batctl -m bat0-{{ s.name }} if add bb{{ s.name }}-{{ t.name }}
+
+{% endfor %}
+
+{% endfor %}

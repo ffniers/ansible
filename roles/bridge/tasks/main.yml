@@ -1,0 +1,8 @@
+- name: Install bridge-utils
+  apt: name=bridge-utils
+
+- name: Install ebtables
+  apt: name=ebtables
+
+- name: Add bridge to /etc/modules
+  lineinfile: dest=/etc/modules regexp="^bridge$" line=bridge

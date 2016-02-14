@@ -1,0 +1,9 @@
+---
+- name: Install dependencies for selfmon.py
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - python3
+
+- name: Install selfmon.py
+  copy: src=selfmon.py dest=/usr/local/bin/selfmon.py mode=0755
+

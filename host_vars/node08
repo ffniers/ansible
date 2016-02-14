@@ -1,0 +1,103 @@
+network:
+    interfaces:
+        - device: rr01
+          auto: true
+          family: inet
+          method: tunnel
+          mode: gre
+          address: 10.0.5.49
+          netmask: 255.255.255.254
+          local: 51.255.151.121
+          endpoint: 151.80.64.186
+          mtu: 1400
+          ttl: 64
+
+        - device: rr01
+          auto: true
+          family: inet6
+          method: static
+          address: 2a03:2260:50:3fdf::2
+          netmask: 64
+
+        - device: br0-niers
+          auto: true
+          family: inet
+          method: static
+          address: 10.41.0.9
+          netmask: 19
+          bridge:
+              ports: none
+ 
+        - device: br0-niers
+          auto: true
+          family: inet6
+          method: static
+          address: 2a03:2260:50:3f00::9
+          netmask: 64
+         
+
+l2tp:
+    node_id: 7
+    tunnel:
+    - name: node04
+      id: 1
+      sessions:
+      - name: niers
+        id: 1
+
+      - name: mg
+        id: 2
+
+      - name: mo
+        id: 3
+
+bird:
+    router_id: 10.41.0.8
+    instances:
+        - name: rr01
+          protocol: bgp
+          neighbor: 10.0.5.36
+          as: 10.0.5.36
+          bgp_med: 2
+    
+        - name: services
+          protocol: bgp
+          source: 10.41.0.8
+          neighbor: 10.41.0.1
+          as: 65401
+          bgp_med: 5
+    
+        - name: node01
+          protocol: bgp
+          source: 10.41.0.8
+          neighbor: 10.41.0.3
+          as: 65401
+          bgp_med: 3
+    
+        - name: node02
+          protocol: bgp
+          source: 10.41.0.8
+          neighbor: 10.41.0.2
+          as: 65401
+          bgp_med: 3
+    
+        - name: node03
+          protocol: bgp
+          source: 10.41.0.8
+          neighbor: 10.41.0.4
+          as: 65401
+          bgp_med: 4
+
+bird6:
+    router_id: 10.41.0.8
+    instances:
+        - name: node01
+          protocol: bgp
+          neighbor: 2a03:2260:50:3f00::2 
+          as: 65401
+          bgp_med: 3
+
+batman:
+    instances:
+    - name: niers
+      hwaddress: 04:bf:ef:ca:cd:9a

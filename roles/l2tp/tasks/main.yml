@@ -1,0 +1,22 @@
+---
+- name: Enable l2tp_eth during boot
+  lineinfile: dest=/etc/modules line=l2tp_eth
+
+- name: Load l2tp_eth module
+  modprobe: name=l2tp_eth
+
+- name: Install freifunk-l2tp systemd script
+  template:
+    src: freifunk-l2tp.service.j2
+    dest: /etc/systemd/system/freifunk-l2tp.service 
+    mode: 0644
+
+- name: Enable freifunk-l2tp systemd script
+  service: name=freifunk-l2tp enabled=yes state=started
+
+- name: Install freifunk-l2tp script
+  template:
+    src: freifunk-l2tp.j2
+    dest: /usr/local/bin/freifunk-l2tp
+    mode: 0755
+

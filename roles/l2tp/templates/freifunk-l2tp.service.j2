@@ -1,0 +1,16 @@
+[Unit]
+Description=Freifunk L2TP
+ConditionFileIsExecutable=/usr/local/bin/freifunk-l2tp
+After=network.target
+Before=rc-local.service fastd.service
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/freifunk-l2tp
+TimeoutSec=0
+RemainAfterExit=yes
+SysVStartPriority=99
+
+[Install]
+WantedBy=network.target
+

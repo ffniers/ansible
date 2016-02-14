@@ -1,0 +1,16 @@
+[Unit]
+Description=ff-niers Compatibility
+ConditionFileIsExecutable=/usr/local/bin/freifunk-mesh-{{ item.name }}
+After=rc-local.service
+Before=freifunk-l2tp.service
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/freifunk-mesh-{{ item.name }}
+TimeoutSec=0
+RemainAfterExit=yes
+SysVStartPriority=99
+
+[Install]
+WantedBy=network.target
+

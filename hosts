@@ -1,0 +1,4 @@
+node04		ansible_ssh_host=node08.ffniers.de ansible_ssh_user=root
+
+[supernodes]
+node08		ansible_ssh_host=node08.ffniers.de ansible_ssh_user=root

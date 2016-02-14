@@ -1,0 +1,13 @@
+---
+- hosts: supernodes
+  roles:
+#  - common
+#  - network
+#  - fastd
+#  - dnsmasq
+#  - bird
+#  - bridge
+#  - firewall
+#  - selfmon
+  - batman-adv
+  - l2tp

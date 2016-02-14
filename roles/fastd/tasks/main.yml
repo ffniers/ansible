@@ -1,0 +1,10 @@
+---
+- name: Adding GPG 16EF3F64CB201D9C
+  apt_key: keyserver=pgpkeys.mit.edu id=16EF3F64CB201D9C
+
+
+- name: Adding repository repo.universe-factory.net
+  apt_repository: repo='deb http://repo.universe-factory.net/debian/ sid main' state=present
+
+- name: Install fastd
+  apt: name=fastd

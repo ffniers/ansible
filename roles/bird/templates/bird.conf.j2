@@ -1,0 +1,43 @@
+# {{ ansible_managed }}
+
+log syslog all;
+router id {{ bird.router_id }};
+
+protocol direct {
+        interface "*";
+};
+
+protocol kernel {
+        device routes;
+        import all;
+        export all;
+        kernel table 42;
+};
+
+protocol device {
+        scan time 8;
+};
+
+function is_default() {
+        return (net ~ [0.0.0.0/0]);
+};
+
+template bgp ibgp {
+        local as 65401;
+        import all;
+        export all;
+        next hop self;
+        deterministic med on;
+};
+
+{% for instance in bird.instances %}
+protocol {{ instance.protocol }} {{ instance.name }} from ibgp {{ '{' }}
+
+{%- if instance.source is defined %}
+        source address {{ instance.source }};
+{% endif %}
+        neighbor {{ instance.neighbor }} as {{ instance.as }};
+        default bgp_med {{ instance.bgp_med }};
+{{ '};' }}
+{% endfor %}
+

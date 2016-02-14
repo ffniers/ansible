@@ -1,0 +1,50 @@
+---
+- name: Create directory /etc/network/interfaces.d
+  file:
+    path: "/etc/network/interfaces.d"
+    state: directory
+  when: network.interfaces
+
+- name: Ensure that files in /etc/network/interfaced.d are read
+  lineinfile: dest=/etc/network/interfaces regexp="^source /etc/network/interfaces.d/\*$" line="source /etc/network/interfaces.d/*"
+
+- name: Retrieve list of existing network configuration files in /etc/network/interfaces.d
+  command: "find /etc/network/interfaces.d/ -type f"
+  changed_when: no
+  when: network.interfaces
+  register: configuration_files_network_interfaces_existing
+
+- name: Create network interface configuration files
+  template:
+    src: device.j2
+    dest: /etc/network/interfaces.d/{{ item.device }}-{{ item.family | default('inet', true) }}
+  with_items: network.interfaces
+  register: network_interfaces_new
+
+- name: Get configuration files
+  set_fact:
+    configuration_files_network_interfaces_new: >
+      [{% for item in network_interfaces_new.results | default([]) -%}
+        u"{{ item.dest | default(item.path) }}"
+        {{ '' if loop.last else ',' }}
+      {%- endfor %}]
+
+- name: Remove orphaned configuration files
+  file:
+    dest: "{{ item }}"
+    state: absent
+  when: item not in configuration_files_network_interfaces_new
+  with_items: configuration_files_network_interfaces_existing.stdout_lines | default([])
+
+- name: Restart network devices
+  service:
+    name: "{{ network_service }}"
+    state: restarted
+    arguments: "INTERFACE={{ item.0 }}"
+  when: >
+    (0 != item.1 | selectattr('changed') | list | length)
+    and ((0 != item.1 | selectattr('item.auto', 'undefined') | list | length)
+      or (true in item.1 | selectattr('item.auto') | list)
+    )
+  with_items: network_interfaces_new.results | default([]) | groupby('item.device')
+
