@@ -1,0 +1,3 @@
+---
+- name: Install isc-dhcp-server packahe
+  apt: pkg=isc-dhcp-server update_cache=yes cache_valid_time=3600

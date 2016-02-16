@@ -4,10 +4,11 @@
 #  - common
 #  - network
 #  - fastd
-#  - dnsmasq
 #  - bird
 #  - bridge
 #  - firewall
 #  - selfmon
-  - batman-adv
-  - l2tp
+#  - batman-adv
+#  - l2tp
+#  - radvd
+  - isc-dhcp-server
