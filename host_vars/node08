@@ -96,6 +96,14 @@ bird6:
           neighbor: 2a03:2260:50:3f00::2 
           as: 65401
           bgp_med: 3
+    protocols:
+        radvd:
+            interfaces:
+                - name: bat0-niers 
+                  rdnss: 2a03:2260:300f:1000::3
+                  dnssl: ffnier.de
+                  prefixes:
+                      - prefix: 2a03:2260:300f:1000::/64
 
 batman:
     instances:

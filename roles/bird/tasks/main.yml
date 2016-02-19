@@ -10,8 +10,14 @@
     src: bird.conf.j2
     dest: /etc/bird/bird.conf
 
-
 - name: Create bird6 configuraion
   template:
     src: bird6.conf.j2
     dest: /etc/bird/bird6.conf
+
+- name: Create radvd configuraion
+  template:
+    src: radvd.conf.j2
+    dest: /etc/bird/radvd.conf
+
+

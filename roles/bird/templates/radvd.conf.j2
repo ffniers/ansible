@@ -1,0 +1,30 @@
+# {{ ansible_managed }}
+
+##################################
+### iPv6 Router Advertisements ###
+##################################
+
+protocol radv {
+        rdnss {
+                ns 2001:4860:4860::8888;
+              };
+
+{% for i in bird6.protocols.radvd.interfaces %}
+        interface "{{ i.name }}" {
+                max ra interval 120;
+                min ra interval 90;
+                link mtu 1280;
+                managed yes;
+                other config yes;
+                rdnss {{ i.rdnss }};
+                dnssl "{{ i.dnssl }}";
+{% for p in i.prefixes %}
+                prefix {{ p.prefix }} {
+                        onlink yes;
+                        autonomous yes;
+                };
+{% endfor %}
+        };
+{% endfor %}
+}
+

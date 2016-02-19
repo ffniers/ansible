@@ -52,5 +52,7 @@ protocol {{ instance.protocol }} {{ instance.name }} from ibgp {
 {% endif %}
         neighbor {{ instance.neighbor }} as {{ instance.as }};
         default bgp_med {{ instance.bgp_med }};
+}
 {% endfor %}
 
+include "/etc/bird/radvd.conf";
