@@ -8,15 +8,15 @@
      dest: /etc/init.d/isc-dhcp6-server
      mode: 0755
 
-- name: Copy dhcpd6.conf to /etc/dhcp/dhcpd.conf
-  copy: 
-     src: dhcpd.conf
-     dest: /etc/dhcp/dhcpd.conf 
-     mode: 0644
+- name: Create dhcpd.conf in /etc/dhcp/dhcpd.conf
+  template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+    mode: 0644
 
-- name: Copy dhcpd6.conf to /etc/dhcp/dhcpd6.conf
-  copy: 
-     src: dhcpd6.conf
+- name: Create dhcpd6.conf in /etc/dhcp/dhcpd6.conf
+  template: 
+     src: dhcpd6.conf.j2
      dest: /etc/dhcp/dhcpd6.conf 
      mode: 0644
 
@@ -25,6 +25,14 @@
      src: isc-dhcp6-server.default
      dest: /etc/default/isc-dhcp6-server
      mode: 0644
+
+- name: Create dhcpd6.leases file
+  file: 
+     path: /var/lib/dhcp/dhcpd6.leases
+     mode: 0644
+     owner: root
+     group: root
+     state: touch
 
 - name: Configure /etc/default/isc-dhcp-server
   lineinfile: dest=/etc/default/isc-dhcp-server regexp="^INTERFACES=" line='INTERFACES="br0-niers"'

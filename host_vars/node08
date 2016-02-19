@@ -39,17 +39,17 @@ network:
 l2tp:
     node_id: 7
     tunnel:
-    - name: node04
-      id: 1
-      sessions:
-      - name: niers
-        id: 1
-
-      - name: mg
-        id: 2
-
-      - name: mo
-        id: 3
+        - name: node04
+          id: 1
+          sessions:
+              - name: niers
+                id: 1
+        
+              - name: mg
+                id: 2
+        
+              - name: mo
+                id: 3
 
 bird:
     router_id: 10.41.0.8
@@ -101,3 +101,52 @@ batman:
     instances:
     - name: niers
       hwaddress: 04:bf:ef:ca:cd:9a
+
+isc_dhcp_server:
+    subnets:
+        - subnet: 10.41.0.0
+          netmask: 255.255.224.0
+          type: 4
+          range: 10.41.28.21 10.41.31.254
+          interface: br0-niers
+          options:
+              - name: subnet-mask
+                value: 255.255.252.0
+     
+              - name: broadcast-address
+                value: 10.41.28.255
+                
+              - name: routers
+                value: 10.41.0.9
+    
+              - name: domain-name-servers
+                value: 10.41.0.2, 10.41.0.2
+    
+              - name: ntp-servers
+                value: 10.41.0.9
+    
+              - name: netbios-name-servers
+                value: 10.20.106.1
+    
+              - name: netbios-node-type 
+                value: 2
+    
+              - name: domain-name 
+                value: "ffniers"
+    
+              - name: interface-mtu
+                value: 1280
+
+        - subnet: '2a03:2260:50:3f00::'
+          netmask: 64
+          type: 6
+          interface: br0-niers
+          options:
+              - name: name-servers
+                value: 2a03:2260:50:3f00::5, 2a03:2260:50:3f00::2
+    
+              - name: sntp-servers
+                value: 2a02:f98:0:26::14
+    
+              - name: domain-search
+                value: '"ffniers.de"'

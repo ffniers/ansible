@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+
+allow leasequery;
+
+{% for s in isc_dhcp_server.subnets %}
+{% if s.type is equalto 6 %}
+subnet6 {{ s.subnet }}/{{ s.netmask }} {
+        interface {{ s.interface }};
+{% for o in s.options %}
+        option dhcp6.{{ o.name }} {{ o.value }};
+{% endfor %}
+}
+{% endif %}
+{% endfor %}

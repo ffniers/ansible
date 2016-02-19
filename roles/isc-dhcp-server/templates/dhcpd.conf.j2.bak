@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+
+authoritative;
+ddns-update-style none;
+log-facility local7;
+one-lease-per-client true;
+deny declines;
+
+{% for s in isc-dhcp-server.subnets %}
+subnet {{ s.subnet }} {
+        interface {{ s.interface }};
+        range {{ s.range }};
+{% for o in s.options %}
+        option {{ o.name }} {{ o.value }};
+{% endfor %}
+        default-lease-time 7200;
+        max-lease-time 7200;
+}
+{% endfor %}

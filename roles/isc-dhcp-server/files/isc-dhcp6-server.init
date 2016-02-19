@@ -3,7 +3,7 @@
 #
 
 ### BEGIN INIT INFO
-# Provides:          isc-dhcp-server6
+# Provides:          isc-dhcp6-server
 # Required-Start:    $remote_fs $network $syslog
 # Required-Stop:     $remote_fs $network $syslog
 # Should-Start:      $local_fs slapd $named
@@ -18,12 +18,12 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 test -f /usr/sbin/dhcpd || exit 0
 
-DHCPD_DEFAULT="${DHCPD_DEFAULT:-/etc/default/isc-dhcp-server6}"
+DHCPD_DEFAULT="${DHCPD_DEFAULT:-/etc/default/isc-dhcp6-server}"
 
 # It is not safe to start if we don't have a default configuration...
 if [ ! -f "$DHCPD_DEFAULT" ]; then
         echo "$DHCPD_DEFAULT does not exist! - Aborting..."
-        if [ "$DHCPD_DEFAULT" = "/etc/default/isc-dhcp-server6" ]; then
+        if [ "$DHCPD_DEFAULT" = "/etc/default/isc-dhcp6-server" ]; then
                 echo "Run 'dpkg-reconfigure isc-dhcp-server' to fix the problem."
         fi
         exit 0
