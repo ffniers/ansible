@@ -1,3 +1,39 @@
 ---
-- name: Install isc-dhcp-server packahe
+- name: Install isc-dhcp-server package
   apt: pkg=isc-dhcp-server update_cache=yes cache_valid_time=3600
+
+- name: Copy isc-dhcp6-server init script
+  copy: 
+     src: isc-dhcp6-server.init
+     dest: /etc/init.d/isc-dhcp6-server
+     mode: 0755
+
+- name: Copy dhcpd6.conf to /etc/dhcp/dhcpd.conf
+  copy: 
+     src: dhcpd.conf
+     dest: /etc/dhcp/dhcpd.conf 
+     mode: 0644
+
+- name: Copy dhcpd6.conf to /etc/dhcp/dhcpd6.conf
+  copy: 
+     src: dhcpd6.conf
+     dest: /etc/dhcp/dhcpd6.conf 
+     mode: 0644
+
+- name: Copy isc-dhcp6-server to /etc/default/isc-dhcp6-server
+  copy: 
+     src: isc-dhcp6-server.default
+     dest: /etc/default/isc-dhcp6-server
+     mode: 0644
+
+- name: Configure /etc/default/isc-dhcp-server
+  lineinfile: dest=/etc/default/isc-dhcp-server regexp="^INTERFACES=" line='INTERFACES="br0-niers"'
+
+- name: Configure /etc/default/isc-dhcp6-server
+  lineinfile: dest=/etc/default/isc-dhcp6-server regexp="^INTERFACES=" line='INTERFACES="br0-niers"'
+
+- name: Restart isc-dhcp-server
+  service: name=isc-dhcp-server enabled=true state=restarted
+
+- name: Restart isc-dhcp6-server
+  service: name=isc-dhcp6-server enabled=true state=restarted
