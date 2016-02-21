@@ -2,9 +2,10 @@
 - hosts: supernodes
   roles:
 #  - common
+  - systemd-timesyncd
 #  - network
 #  - fastd
-  - bird
+#  - bird
 #  - bridge
 #  - firewall
 #  - selfmon
