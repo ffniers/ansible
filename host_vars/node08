@@ -35,7 +35,38 @@ network:
           address: 2a03:2260:50:3f00::9
           netmask: 64
          
+        - device: br0-mg
+          auto: true
+          family: inet
+          method: static
+          address: 10.41.160.9
+          netmask: 19
+          bridge:
+              ports: none
+ 
+        - device: br0-mg
+          auto: true
+          family: inet6
+          method: static
+          address: 2a03:2230:50:3f01::9
+          netmask: 64
 
+        - device: br0-mo
+          auto: true
+          family: inet
+          method: static
+          address: 10.41.128.9
+          netmask: 19
+          bridge:
+              ports: none
+ 
+        - device: br0-mo
+          auto: true
+          family: inet6
+          method: static
+          address: 2a03:2230:50:3f03::9
+          netmask: 64
+ 
 l2tp:
     node_id: 7
     tunnel:
@@ -109,6 +140,22 @@ batman:
     instances:
     - name: niers
       hwaddress: 04:bf:ef:ca:cd:9a
+    - name: mg
+      hwaddress: 00:16:3e:aa:ac:9c
+    - name: mo
+      hwaddress: 00:16:3e:aa:aa:9c
+
+fastd:
+    instances:
+    - name: niers
+      hwaddress: 02:bf:ef:ca:cc:9a
+      bind_port: 10000
+    - name: mg
+      hwaddress: 00:16:3e:aa:ac:9b
+      bind_port: 10030
+    - name: mo
+      hwaddress: 00:16:3e:aa:aa:9b
+      bind_port: 10020
 
 isc_dhcp_server:
     subnets:

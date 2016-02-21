@@ -2,14 +2,14 @@
 - hosts: supernodes
   roles:
 #  - common
-  - systemd-timesyncd
-#  - network
-#  - fastd
+#  - systemd-timesyncd
+  - network
+  - batman-adv
+#  - l2tp
+  - fastd
 #  - bird
 #  - bridge
 #  - firewall
 #  - selfmon
-#  - batman-adv
-#  - l2tp
 #  - radvd
 #  - isc-dhcp-server

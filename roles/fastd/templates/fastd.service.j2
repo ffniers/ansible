@@ -1,0 +1,26 @@
+# {{ ansible_managed }}
+[Unit]
+SourcePath=/etc/init.d/fastd
+Description=LSB: Fast and Secure Tunneling Daemon
+Before=runlevel2.target runlevel3.target runlevel4.target runlevel5.target shutdown.target
+After=network-online.target remote-fs.target systemd-journald-dev-log.socket network-manager.service {% for i in batman.instances %}freifunk-mesh-{{ i.name }}.service {% endfor %}
+
+Wants=network-online.target
+Conflicts=shutdown.target
+
+[Service]
+Type=forking
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+GuessMainPID=no
+RemainAfterExit=yes
+SysVStartPriority=2
+ExecStart=/etc/init.d/fastd start
+ExecStop=/etc/init.d/fastd stop
+ExecReload=/etc/init.d/fastd reload
+
+[Install]
+WantedBy=network.target
+

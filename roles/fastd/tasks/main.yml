@@ -2,9 +2,69 @@
 - name: Adding GPG 16EF3F64CB201D9C
   apt_key: keyserver=pgpkeys.mit.edu id=16EF3F64CB201D9C
 
-
 - name: Adding repository repo.universe-factory.net
   apt_repository: repo='deb http://repo.universe-factory.net/debian/ sid main' state=present
 
 - name: Install fastd
   apt: name=fastd
+
+- name: Create system account for fastd 
+  user: 
+      name: fastd
+      system: yes
+
+- name: Create fastd config direcories for instances
+  file:
+      path: /etc/fastd/freifunk-{{ item.name }}
+      mode: 0755
+      owner: fastd
+      state: directory
+  with_items: fastd.instances
+
+- name: Create fastd peers dummy directory
+  file:
+      path: /etc/fastd/freifunk-{{ item.name }}/dummy
+      mode: 0755
+      owner: fastd
+      state: directory
+  with_items: fastd.instances
+
+- name: Create fastd config for instances
+  template:
+      src: freifunk-fastd.conf.j2
+      dest: /etc/fastd/freifunk-{{ item.name }}/fastd.conf
+      owner: fastd
+      mode: 0644
+  with_items: fastd.instances
+
+- name: Create cron job for updating /etc/fastd/fastd-blacklist.json 
+  cron: 
+      name: Update fastd-blacklist.json
+      minute: "*/5"
+      job: "wget -q -O /etc/fastd/fastd-blacklist.json https://raw.githubusercontent.com/ffruhr/fastdbl/master/fastd-blacklist.json"
+      user: root
+      cron_file: fastd-blacklst-update
+
+- name: Copy fast-blacklist-local to /etc/fastd/fastd-blacklist-local
+  copy: 
+      src: fastd-blacklist-local
+      dest: /etc/fastd/fastd-blacklist-local
+      mode: 0644
+
+- name: Copy fast-blacklist.sh file to /usr/local/bin/fastd-blacklist.sh
+  copy: 
+      src: fastd-blacklist.sh
+      dest: /usr/local/bin/fastd-blacklist.sh
+      mode: 0755
+
+- name: Create /etc/systemd/system/fastd.service
+  template:
+      src: fastd.service.j2
+      dest: /etc/systemd/system/fastd.service
+      mode: 0644
+
+- name: Enable and start fastd service
+  service:
+      name: fastd
+      enabled: true
+      state: started
