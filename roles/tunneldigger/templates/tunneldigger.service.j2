@@ -1,0 +1,11 @@
+[Unit]
+Description = Start tunneldigger L2TPv3 broker - {{ item.name }}
+After = network.target freifunk-l2tp.service
+
+[Service]
+Restart = on-failure
+ExecStart = /srv/tunneldigger/bin/start-broker-{{ item.name }}.sh
+
+[Install]
+WantedBy = multi-user.target
+

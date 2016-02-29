@@ -1,0 +1,66 @@
+---
+- name: Install required debian packages
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - git
+    - iproute
+    - bridge-utils
+    - libnetfilter-conntrack3
+    - python-dev
+    - python-pip
+    - python-virtualenv
+    - libevent-dev
+    - ebtables
+
+- name: Creating directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /srv/tunneldigger
+    - /srv/tunneldigger/etc
+
+- name: Checkout tunneldigger to /usr/src
+  git: 
+    repo: https://github.com/wlanslovenija/tunneldigger.git
+    dest: /srv/tunneldigger/tunneldigger
+
+- name: Setup Python virtual environment
+  pip: 
+    requirements: /srv/tunneldigger/tunneldigger/broker/requirements.txt 
+    virtualenv: /srv/tunneldigger
+
+- name: Create l2tp_broker config files
+  template:
+    src: l2tp_broker.cfg.j2
+    dest: /srv/tunneldigger/etc/l2tp_broker-{{ item.name }}.conf
+    mode: 0644
+  with_items: tunneldigger.instances
+
+- name: Create up-hook scripts
+  template:
+    src: up-hook.sh.j2
+    dest: /srv/tunneldigger/tunneldigger/broker/scripts/up-hook-{{ item.name }}.sh
+    mode: 0755
+  with_items: tunneldigger.instances
+
+- name: Create down-hook scripts
+  template:
+    src: down-hook.sh.j2
+    dest: /srv/tunneldigger/tunneldigger/broker/scripts/down-hook-{{ item.name }}.sh
+    mode: 0755
+  with_items: tunneldigger.instances
+
+- name: Create start script
+  template:
+    src: start-broker.sh.j2
+    dest: /srv/tunneldigger/bin/start-broker-{{ item.name }}.sh
+    mode: 0755
+  with_items: tunneldigger.instances
+
+- name: Create systemd service files
+  template:
+    src: tunneldigger.service.j2
+    dest: /etc/systemd/system/tunneldigger-{{ item.name }}.service
+    mode: 0755
+  with_items: tunneldigger.instances

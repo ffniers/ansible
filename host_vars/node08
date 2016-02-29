@@ -157,6 +157,30 @@ fastd:
       hwaddress: 00:16:3e:aa:aa:9b
       bind_port: 10020
 
+tunneldigger:
+    instances:
+     - name: niers
+       broker:
+           address: 51.255.151.121
+           interface: eth0 
+           port: 4215
+           port_base: 21000
+           tunnel_id_base: 1000
+     - name: mg
+       broker: 
+           address: 51.255.151.121
+           interface: eth0 
+           port: 4216
+           port_base: 22000
+           tunnel_id_base: 2000
+     - name: mo
+       broker:
+           address: 51.255.151.121
+           interface: eth0 
+           port: 4217
+           port_base: 23000
+           tunnel_id_base: 3000
+
 isc_dhcp_server:
     subnets:
         - subnet: 10.41.0.0

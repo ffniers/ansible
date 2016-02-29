@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# {{ ansible_managed }}
+
+set -x
+set +e
+
+BLACKLIST=/srv/tunneldigger/blacklist.txt
+INTERFACE="$3"
+
+if grep -q $8 $BLACKLIST; then
+   iptables -A INPUT -s $5 -j DROP -m comment --comment "$8"
+else
+   ip link set dev $INTERFACE up mtu 1346
+   brctl addif br-l2tp-{{ item.name }} $INTERFACE
+fi
+
