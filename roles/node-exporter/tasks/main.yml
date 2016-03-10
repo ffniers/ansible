@@ -1,7 +1,8 @@
 ---
 - name: Install required debian packages
   apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
-  with_items:
+  with_items: 
+    - curl
     - git
 
 - name: Creating directories
@@ -12,7 +13,7 @@
     - /srv/node_exporter
     - /srv/node_exporter/textfile_collector
 
-- name: Checkout tunneldigger to /usr/src
+- name: Checkout node_exporter to /usr/src
   git: 
     repo: https://github.com/prometheus/node_exporter.git
     dest: /srv/node_exporter
