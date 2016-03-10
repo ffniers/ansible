@@ -1,0 +1,34 @@
+---
+- name: Install required debian packages
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - git
+
+- name: Creating directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /srv/node_exporter
+    - /srv/node_exporter/textfile_collector
+
+- name: Checkout tunneldigger to /usr/src
+  git: 
+    repo: https://github.com/prometheus/node_exporter.git
+    dest: /srv/node_exporter
+
+- name: Build node_exporter
+  command: 'chdir=/srv/node_exporter "make"'
+
+- name: Create systemd service files
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    mode: 0755
+
+- name: Enable and start Prometheus node exporter
+  service:
+    name: node_exporter
+    enabled: true
+    state: started
+

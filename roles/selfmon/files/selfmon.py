@@ -10,7 +10,11 @@ INSTANCES = ['niers', 'mo', 'mg']
 SUPERNODES = ['node01', 'node02', 'node03', 'node04', 'node05', 'node08', 'map']
 
 NODENAME = platform.node()
-SUPERNODES.remove(NODENAME)
+
+try:
+    SUPERNODES.remove(NODENAME)
+except:
+    pass
 
 NODES_MIN_THRESHOLD = 10
 

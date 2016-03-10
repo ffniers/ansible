@@ -1,0 +1,12 @@
+[Unit]
+Description="NodeExporter for Prometeus"
+
+[Service]
+ExecStart=
+ExecStart=/srv/node_exporter/node_exporter -collector.textfile.directory=/srv/node_exporter/textfile_collector/
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=network.target
+

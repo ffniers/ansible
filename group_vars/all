@@ -3,3 +3,10 @@ instances:
   - niers
   - mo
   - mg
+
+administrators:
+  - dweuthen
+  - fragstone
+  - dgoersch
+  - mtrier
+

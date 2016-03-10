@@ -1,5 +1,4 @@
 ---
-# Install basic tools
 - name: Install basic tools
   apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
   with_items:
@@ -13,6 +12,16 @@
     - tmux
     - curl
     - haveged
+    - figlet
+
+- name: Remove /etc/motd 
+  file: path=/etc/motd state=absent
+
+- name: Create /etc/motd file
+  template: src=motd.j2 dest=/etc/motd mode=0644
+
+- name: Add hostname to /etc/motd
+  shell: figlet $(hostname) >> /etc/motd
 
 - name: Set sysctl kernel.panic_on_oops to 1
   sysctl: name=kernel.panic_on_oops value=1 state=present reload=yes
@@ -20,27 +29,20 @@
 - name: Set sysctl kernel.panic to 1
   sysctl: name=kernel.panic value=1 state=present reload=yes
 
-# Remove user freifunk
 - name: Remove user freifunk
   user: name=freifunk state=absent remove=yes
 
 - name: Remove home directory of user freifunk
   file: path=/home/freifunk state=absent
 
-# Set up sudo and create users 
 - name: Install sudo
   apt: name=sudo
 
 - name: Craete users and add to sudo group
   user: name={{ item }} groups=sudo
-  with_items:
-    - dweuthen
-    - dgoersch
-    - tfragstein
+  with_items: "{{ administrators }}"
 
 - name: Set up authorized_keys for root
-  authorized_key: user=root key="{{ item }}" state=present
-  with_file:
-    - dweuthen.pub
-    - tfragstein.pub
-    - mtrier.pub
+  authorized_key: user=root key="{{ lookup('file', "keyfiles/" + item + '.pub') }}" state=present
+  with_items: "{{ administrators }}"
+

@@ -1,0 +1,17 @@
+---
+- hosts: supernodes-dev
+  roles:
+#  - common
+#  - systemd-timesyncd
+#  - network
+   - node-exporter
+#  - batman-adv
+#  - l2tp
+#  - fastd
+#  - tunneldigger
+#  - bird
+#  - bridge
+#  - firewall
+#  - selfmon
+#  - radvd
+#  - isc-dhcp-server
