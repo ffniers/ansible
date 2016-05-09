@@ -3,7 +3,7 @@ Description="NodeExporter for Prometeus"
 
 [Service]
 ExecStart=
-ExecStart=/srv/node_exporter/node_exporter -collector.textfile.directory=/srv/node_exporter/textfile_collector/
+ExecStart=/srv/node_exporter/node_exporter -collector.textfile.directory=/var/lib/node_exporter/textfile_collector/
 Restart=always
 RestartSec=15
 

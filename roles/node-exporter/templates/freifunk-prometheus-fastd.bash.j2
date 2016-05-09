@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+TEMP_FILE=/tmp/freifunk-prometheus-fastd.prom
+PROM_FILE=/var/lib/node_exporter/textfile_collector/fastd.prom
+
+
+# Empty file
+> ${TEMP_FILE}
+
+{% for instance in instances %}
+# {{ instance }}
+echo "fastd_{{ instance }}" `socat - UNIX-CONNECT:/tmp/fastd_{{ instance }}.sock | grep -oi establ | wc -l` >> ${TEMP_FILE}
+{% endfor %}
+
+cat ${TEMP_FILE} > ${PROM_FILE}
+

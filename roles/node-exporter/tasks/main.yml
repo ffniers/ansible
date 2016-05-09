@@ -11,7 +11,63 @@
     state: directory
   with_items:
     - /srv/node_exporter
-    - /srv/node_exporter/textfile_collector
+    - /var/lib/node_exporter/textfile_collector
+
+- name: Install L2TP collector
+  template:
+    src: freifunk-prometheus-l2tp.bash.j2
+    dest: /usr/local/bin/freifunk-prometheus-l2tp.bash
+    mode: 0755
+
+- name: Ensure that cronjob for L2TP collector exists
+  cron:
+   name: "Prometheus L2TP Collector" 
+   user: root
+   cron_file: node_exporter
+   minute: "*/2" 
+   job: "/usr/local/bin/freifunk-prometheus-l2tp.bash > /dev/null"
+
+
+- name: Install dnsmasq collector
+  template:
+    src: freifunk-prometheus-dnsmasq.bash.j2
+    dest: /usr/local/bin/freifunk-prometheus-dnsmasq.bash
+    mode: 0755
+
+- name: Ensure that cronjob for dnsmasq collector exists
+  cron:
+   name: "Prometheus dnsmasq Collector" 
+   user: root
+   cron_file: node_exporter
+   minute: "*/2" 
+   job: "/usr/local/bin/freifunk-prometheus-dnsmasq.bash > /dev/null"
+
+- name: Install dnsmasq leasaes collector
+  template:
+    src: freifunk-prometheus-dnsmasq-leases.bash.j2
+    dest: /usr/local/bin/freifunk-prometheus-dnsmasq-leases.bash
+    mode: 0755
+
+- name: Ensure that cronjob for dnsmasq leases collector exists
+  cron:
+   name: "Prometheus dnsmasq leases Collector" 
+   user: root
+   cron_file: node_exporter
+   job: "/usr/local/bin/freifunk-prometheus-dnsmasq-leases.bash > /dev/null"
+
+- name: Install fastd collector
+  template:
+    src: freifunk-prometheus-fastd.bash.j2
+    dest: /usr/local/bin/freifunk-prometheus-fastd.bash
+    mode: 0755
+
+- name: Ensure that cronjob for fastd collector exists
+  cron:
+   name: "Prometheus fastd Collector" 
+   user: root
+   cron_file: node_exporter
+   minute: "*/2" 
+   job: "/usr/local/bin/freifunk-prometheus-fastd.bash > /dev/null"
 
 - name: Checkout node_exporter to /usr/src
   git: 
@@ -25,11 +81,12 @@
   template:
     src: node_exporter.service.j2
     dest: /etc/systemd/system/node_exporter.service
-    mode: 0755
+    mode: 0644
+  notify:
+    - Restart node_exporter
 
 - name: Enable and start Prometheus node exporter
   service:
     name: node_exporter
     enabled: true
     state: started
-

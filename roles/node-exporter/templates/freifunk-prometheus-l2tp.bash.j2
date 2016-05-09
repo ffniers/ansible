@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+TEMP_FILE=/tmp/freifunk-prometheus-l2tp.prom
+PROM_FILE=/var/lib/node_exporter/textfile_collector/l2tp.prom
+
+# Empty file
+> ${TEMP_FILE}
+
+{% for instance in instances %}
+# {{ instance }}
+echo "l2tp_{{ instance }}" `/sbin/brctl show br-l2tp-{{ instance }} | /bin/grep -v ^bridge | wc -l` >> ${TEMP_FILE}
+{% endfor %}
+
+cat ${TEMP_FILES} > ${PROM_FILE}

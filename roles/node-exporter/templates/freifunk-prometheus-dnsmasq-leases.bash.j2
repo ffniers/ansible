@@ -1,0 +1,25 @@
+#!/bin/bash
+
+
+TEMP_FILE=
+PROM_FILE=/var/lib/node_exporter/textfile_collector/leases_log.prom
+TIME_DELTA_ACCEPT="500"
+
+# Empty file
+> ${PROM_FILE}
+
+{% for instance in instances %}
+STATUS=`stat -c %Y /var/lib/misc/dnsmasq_{{ instance }}.leases`
+UNIXT=`date +%s`
+
+TIME_DELTA=$(( ${UNIXT}-${STATUS} ))
+echo "LEASES_{{ instance }} ${TIME_DELTA}" >> ${TEMP_FILE}
+
+if [ ${TIME_DELTA} -gt ${TIME_DELTA_ACCEPT} ]; then
+  logger "Leases to old - {{ instance }} ${TIME_DELTA}"
+  /etc/init.d/dnsmasq-{{ instance }} restart
+fi
+
+{% endfor %}
+
+cat ${TEMP_FILE} > ${PROM_FILE}

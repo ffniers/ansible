@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+PROM_FILE=/var/lib/node_exporter/textfile_collector/dnsmasq.prom
+
+wc -l /var/lib/misc/* | grep "/var/lib"| awk '{print $2" " $1}'| sed -e s#/var/lib/misc/## -e s#.leases## > ${PROM_FILE}
+
