@@ -1,0 +1,47 @@
+l2tp:
+    node_id: 1
+    tunnel:
+    - name: node02
+      id: 2
+      sessions:
+      - name: niers
+        id: 1
+
+      - name: mg
+        id: 2
+
+      - name: mo
+        id: 3
+    - name: node03
+      id: 3
+      sessions:
+      - name: niers
+        id: 1
+
+      - name: mg
+        id: 2
+
+      - name: mo
+        id: 3
+    - name: node04
+      id: 4
+      sessions:
+      - name: niers
+        id: 1
+
+      - name: mg
+        id: 2
+
+      - name: mo
+        id: 3
+    - name: node05
+      id: 5
+      sessions:
+      - name: niers
+        id: 1
+
+      - name: mg
+        id: 2
+
+      - name: mo
+        id: 3

@@ -1,8 +1,6 @@
 ---
-- hosts: supernodes
+- hosts: services
   roles:
   - common
   - systemd-timesyncd
-  - selfmon
-  - node-exporter
   - l2tp
