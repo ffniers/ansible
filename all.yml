@@ -3,6 +3,11 @@
   hosts: all
   gather_facts: True
   tasks:
-    - debug: var=ansible_distribution
+    - debug: var=ansible_nodename
+
+- name: Deploy l2tp
+  hosts: all
+  roles: 
+    - l2tp
   
 

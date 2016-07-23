@@ -1,6 +1,0 @@
----
-- hosts: services
-  roles:
-  - common
-  - systemd-timesyncd
-  - l2tp

@@ -1,6 +1,3 @@
-[services]
-services        ansible_ssh_host=services.ffniers.de ansible_ssh_user=root
-
 [supernodes]
 node01		ansible_ssh_host=node01.ffniers.de ansible_ssh_user=root
 node02		ansible_ssh_host=node02.ffniers.de ansible_ssh_user=root
@@ -10,3 +7,9 @@ node05		ansible_ssh_host=node05.ffniers.de ansible_ssh_user=root
 
 [supernodes-dev]
 node08		ansible_ssh_host=node08.ffniers.de ansible_ssh_user=root
+
+[services]
+services        ansible_ssh_host=services.ffniers.de ansible_ssh_user=root
+
+[services-dev]
+services2       ansible_ssh_host=services2.ffniers.de ansible_ssh_user=root
