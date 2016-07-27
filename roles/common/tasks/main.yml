@@ -14,14 +14,12 @@
     - haveged
     - figlet
 
-- name: Remove /etc/motd 
-  file: path=/etc/motd state=absent
+- name: figlet name
+  command: /usr/bin/figlet -c -w 80 ${ansible_hostname}
+  register: figlethost
 
-- name: Create /etc/motd file
-  template: src=motd.j2 dest=/etc/motd mode=0644
-
-- name: Add hostname to /etc/motd
-  shell: figlet $(hostname) >> /etc/motd
+- name: deploy motd file
+  template: src=motd.j2 dest=/etc/motd owner=root mode=0644
 
 - name: Set sysctl kernel.panic_on_oops to 1
   sysctl: name=kernel.panic_on_oops value=1 state=present reload=yes
