@@ -10,7 +10,6 @@
     path: "{{ item }}"
     state: directory
   with_items:
-    - /srv/node_exporter
     - /var/lib/node_exporter/textfile_collector
 
 - name: Install L2TP collector
@@ -69,13 +68,30 @@
    minute: "*/2" 
    job: "/usr/local/bin/freifunk-prometheus-fastd.bash > /dev/null"
 
-- name: Checkout node_exporter to /usr/src
-  git: 
-    repo: https://github.com/prometheus/node_exporter.git
-    dest: /srv/node_exporter
+- name: Set node_exporter variables
+  vars:
+    node_exporter_version: "0.12.0"
+  set_fact:
+    node_exporter_version: "{{ node_exporter_version }}"
+    node_exporter_basename: "node_exporter-{{ node_exporter_version }}.linux-amd64"
 
-- name: Build node_exporter
-  command: 'chdir=/srv/node_exporter "make"'
+- name: Download node_exporter binary from github
+  vars:
+    node_exporter_dlpath: "https://github.com/prometheus/node_exporter/releases/download/{{ node_exporter_version }}/{{ node_exporter_basename }}.tar.gz"
+  unarchive:
+    src: "{{ node_exporter_dlpath }}"
+    dest: /srv/
+    owner: root
+    group: root
+    copy: no
+
+- name: create canonical node_exporter symlink
+  file:
+    src: "{{ node_exporter_basename }}"
+    dest: /srv/node_exporter 
+    owner: root
+    group: root
+    state: link
 
 - name: Create systemd service files
   template:
