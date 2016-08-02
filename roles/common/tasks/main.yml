@@ -62,7 +62,7 @@
 - name: Install sudo
   apt: name=sudo
 
-- name: Craete users and add to sudo group
+- name: Create users and add to sudo group
   user: name={{ item }} groups=sudo
   with_items: "{{ administrators }}"
 
