@@ -7,7 +7,7 @@
   notify:
     - Restart systemd-timesyncd
 
-- name: Restart service systemd-timesyncd
+- name: Make sure service systemd-timesyncd is running and started on boot
   service: 
       name: systemd-timesyncd 
       enabled: true 
