@@ -15,11 +15,37 @@
     - figlet
 
 - name: figlet name
-  command: /usr/bin/figlet -c -w 80 ${ansible_hostname}
+  command: /usr/bin/figlet -c -w 80 {{ansible_hostname}}
   register: figlethost
 
-- name: deploy motd file
-  template: src=motd.j2 dest=/etc/motd owner=root mode=0644
+- name: make sure /etc/motd is a symlink
+  file:
+    src=/var/run/motd
+    dest=/etc/motd
+    state=link
+    force=yes
+
+- name: deploy motd.tail file
+  template: src=motd.j2 dest=/etc/motd.tail owner=root mode=0644
+
+- name: make sure /etc/update-motd.d exists
+  file:
+    path=/etc/update-motd.d
+    owner=root
+    group=root
+    mode=755
+    state=directory
+
+- name: deploy /etc/update-motd.d content
+  template:
+    src={{ item }}
+    dest=/etc/update-motd.d/{{ item }}
+    owner=root
+    group=root
+    mode=755
+  with_items:
+    - update-motd.d-10uname
+    - update-motd.d-20tail
 
 - name: Set sysctl kernel.panic_on_oops to 1
   sysctl: name=kernel.panic_on_oops value=1 state=present reload=yes
