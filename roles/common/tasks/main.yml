@@ -14,14 +14,38 @@
     - haveged
     - figlet
 
-- name: Remove /etc/motd 
-  file: path=/etc/motd state=absent
+- name: figlet name
+  command: /usr/bin/figlet -c -w 80 {{ansible_hostname}}
+  register: figlethost
 
-- name: Create /etc/motd file
-  template: src=motd.j2 dest=/etc/motd mode=0644
+- name: make sure /etc/motd is a symlink
+  file:
+    src=/var/run/motd
+    dest=/etc/motd
+    state=link
+    force=yes
 
-- name: Add hostname to /etc/motd
-  shell: figlet $(hostname) >> /etc/motd
+- name: deploy motd.tail file
+  template: src=motd.j2 dest=/etc/motd.tail owner=root mode=0644
+
+- name: make sure /etc/update-motd.d exists
+  file:
+    path=/etc/update-motd.d
+    owner=root
+    group=root
+    mode=755
+    state=directory
+
+- name: deploy /etc/update-motd.d content
+  template:
+    src={{ item }}
+    dest=/etc/update-motd.d/{{ item }}
+    owner=root
+    group=root
+    mode=755
+  with_items:
+    - update-motd.d-10uname
+    - update-motd.d-20tail
 
 - name: Set sysctl kernel.panic_on_oops to 1
   sysctl: name=kernel.panic_on_oops value=1 state=present reload=yes
@@ -38,7 +62,7 @@
 - name: Install sudo
   apt: name=sudo
 
-- name: Craete users and add to sudo group
+- name: Create users and add to sudo group
   user: name={{ item }} groups=sudo
   with_items: "{{ administrators }}"
 
