@@ -1,0 +1,31 @@
+---
+- name: Add packagecloud GPG key
+  apt_key: 
+    url: https://packagecloud.io/gpg.key
+    state: present
+
+- name: Add grafana repository
+  apt_repository: 
+    repo: 'deb https://packagecloud.io/grafana/stable/debian/ jessie main' 
+    state: present
+
+- name: Install grafana
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - apt-transport-https
+    - grafana
+  notify:
+    - Restart grafana
+
+- name: Configure Grafana
+  template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+  notify:
+    - Restart grafana
+
+- name: Enable and start grafa service
+  service:
+    name: grafana-server
+    enabled: yes
+    state: running

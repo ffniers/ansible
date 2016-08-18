@@ -1,0 +1,14 @@
+l2tp:
+    node_id: 6
+    tunnel:
+    - name: node08
+      id: 1
+      sessions:
+      - name: niers
+        id: 1
+
+      - name: mg
+        id: 2
+
+      - name: mo
+        id: 3
