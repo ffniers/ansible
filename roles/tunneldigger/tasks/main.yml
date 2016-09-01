@@ -22,7 +22,7 @@
 
 - name: Checkout tunneldigger to /usr/src
   git: 
-    repo: https://github.com/wlanslovenija/tunneldigger.git
+    repo: https://github.com/ffrl/tunneldigger
     dest: /srv/tunneldigger/tunneldigger
 
 - name: Setup Python virtual environment
