@@ -8,6 +8,7 @@ import time
 
 INSTANCES = ['niers', 'mo', 'mg']
 SUPERNODES = ['node01', 'node02', 'node03', 'node04', 'node05', 'node08', 'map']
+L2TPIDS = ['1', '2', '3', '4', '5', '6', '7']
 
 NODENAME = platform.node()
 
@@ -96,22 +97,6 @@ for instance in INSTANCES:
     print('RUNNING CHECKS FOR INSTANCE: ' + instance);
     print('------------------------------------------------------------')
 
-    run_test(test_description='dnsmasq processes', 
-                 subtest_description='{0} dnsmasq processes running', 
-                 command='ps h -o args -C dnsmasq', 
-                 regex='\/usr\/sbin\/dnsmasq.*(\-C \/home\/' + NODENAME + '\/conf\/dnsmasq-' + instance + '\.conf|\-\-conf-file=\/etc\/dnsmasq-' + instance +'\.conf).*',
-                 compare='count', 
-                 relate='>=',
-                 value=1)
-
-    run_test(test_description='age of dnsmasq leases file', 
-                 subtest_description='leases file was last modified within 500 seconds', 
-                 command='stat -c %Y /var/lib/misc/dnsmasq_' + instance + '.leases', 
-                 regex='(.*)',
-                 compare='int', 
-                 relate='>',
-                 value=int(time.time() - 500))
-
     run_test(test_description='fastd processes', 
                  subtest_description='{0} fast processes running', 
                  command='ps h -o args -C fastd', 
@@ -141,14 +126,14 @@ for instance in INSTANCES:
                  command='batctl -m bat0-' + instance + ' gwl -H', 
                  regex='.*\[\s*bb' + instance + '-(.*)\].*', 
                  compare='list', 
-                 value=SUPERNODES)
+                 value=L2TPIDS)
 
     run_test(test_description='interfaces', 
                  subtest_description='Interface "bb' + instance + '-{0}"', 
                  command='batctl -m bat0-' + instance + ' if', 
                  regex='bb' + instance + '-(.*): active', 
                  compare='list', 
-                 value=SUPERNODES)
+                 value=L2TPIDS)
 
     run_test(test_description='number of connected nodes', 
                  subtest_description='{0} connected nodes', 
@@ -170,6 +155,30 @@ for instance in INSTANCES:
 
 print('RUNNING GENERIC CHECKS')
 print('------------------------------------------------------------')
+
+run_test(test_description='ISC DHCPD processes', 
+             subtest_description='{0} dhcpd processes found', 
+             command='ps h -o args -C dhcpd', 
+             regex='dhcpd -user dhcpd -group dhcpd -f -(4|6) -pf /run/dhcp-server/dhcpd6?.pid -cf /etc/dhcp/dhcpd6?.conf',
+             compare='count', 
+             relate='=',
+             value=2)
+
+run_test(test_description='age of dhcpd.leases file', 
+             subtest_description='leases file was last modified within 500 seconds', 
+             command='stat -c %Y /var/lib/dhcp/dhcpd.leases', 
+             regex='(.*)',
+             compare='int', 
+             relate='>',
+             value=int(time.time() - 500))
+
+run_test(test_description='age of dhcpd6.leases file', 
+             subtest_description='leases file was last modified within 500 seconds', 
+             command='stat -c %Y /var/lib/dhcp/dhcpd6.leases', 
+             regex='(.*)',
+             compare='int', 
+             relate='>',
+             value=int(time.time() - 500))
 
 run_test(test_description='IP rule 10 for traffic from nodes', 
              subtest_description='{0} rules found', 
