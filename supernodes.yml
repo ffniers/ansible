@@ -1,8 +1,9 @@
 ---
 - hosts: supernodes
   roles:
-  - common
-  - systemd-timesyncd
-  - selfmon
-  - node-exporter
-  - l2tp
+#  - common
+#  - systemd-timesyncd
+#  - selfmon
+#  - node-exporter
+#  - l2tp
+  - check-mk-agent

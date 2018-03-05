@@ -1,8 +1,6 @@
 ---
 - hosts: services-dev
   roles:
-  #- common
-  #- systemd-timesyncd
+  - common
   - l2tp
-  #- grafana
-  
+  - grafana
