@@ -1,0 +1,15 @@
+---
+- name: Restart icinga
+  service: 
+    name: icinga
+    state: restarted
+
+- name: Restart apache2
+  service: 
+    name: apache2
+    state: restarted
+
+- name: Start npcd
+  service: 
+    name: npcd
+    state: started

@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+
+{% for file in check_mk_agent.fileinfo %}
+{{ file }}
+{% endfor %}

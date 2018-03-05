@@ -1,0 +1,42 @@
+# {{ ansible_managed }}
+###############################################################################
+# contacts.cfg
+###############################################################################
+
+
+
+
+###############################################################################
+###############################################################################
+#
+# CONTACTS
+#
+###############################################################################
+###############################################################################
+
+define contact {
+    contact_name                    dweuthen
+    alias                           Daniel Weuthen
+    service_notification_period     workhours
+    host_notification_period        workhours
+    service_notification_options    c
+    host_notification_options       d
+    service_notification_commands   notify-service-by-pipe, notify-service-by-email
+    host_notification_commands      notify-host-by-pipe, notify-host-by-email
+    email                           daniel@weuthen-net.de
+}
+
+
+###############################################################################
+###############################################################################
+#
+# CONTACT GROUPS
+#
+###############################################################################
+###############################################################################
+
+define contactgroup {
+    contactgroup_name               admins
+    alias                           Niersufer Administrators
+    members                         dweuthen
+}

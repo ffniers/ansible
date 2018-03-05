@@ -1,0 +1,80 @@
+---
+- name: Install check-mk-server
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - check-mk-server
+    - check-mk-config-icinga
+
+- name: Deploy check-mk main configuration file
+  template:
+    src: main.mk.j2
+    dest: /etc/check_mk/main.mk
+  notify:
+    - Rebuild inventory
+    - Reload configuration
+
+- name: Deploy check-mk configuration 
+  template:
+    src: "conf.d/{{ item }}.j2"
+    dest: "/etc/check_mk/conf.d/{{ item }}"
+  with_items:
+    - check_parameters.mk
+#    - datasource_programs.mk
+#    - extra_host_conf.mk
+#    - extra_service_conf.mk
+#    - fileinfo_groups.mk
+#    - host_contactgroups.mk
+#    - ignored_checks.mk
+#    - ignored_checktypes.mk
+    - ignored_services.mk
+#    - inventory_df_exclude_mountpoints.mk
+    - inventory_processes.mk
+#    - inventory_services.mk
+#    - ipaddresses.mk
+#    - parents.mk
+#    - legacy_checks.mk
+  notify:
+    - Rebuild inventory
+    - Reload configuration
+
+- name: Download check_mk server plugin "bird"
+  get_url:
+    url: https://mathias-kettner.de/check_mk_exchange_download.php?HTML=&file=bird-1.1.mkp
+    dest: /usr/src/bird-1.1.mkp
+    checksum: sha256:039e233e05f6a994dfa0a9af261b0d419b9972ca3e50d06457c6274f38656e13
+
+- name: Install check_mk server plugin "bird"
+  command: check_mk -vP install /usr/src/bird-1.1.mkp
+
+- name: Download check_mk server plugin "entropy_avail"
+  get_url:
+    url: https://mathias-kettner.de/check_mk_exchange_download.php?HTML=yes&file=entropy_avail-1.0.mkp
+    dest: /usr/src/entropy_avail-1.0.mkp
+    checksum: md5:5d3188e7ce12a8ab6056cc8dfb3a4ec1
+
+- name: Install check_mk server plugin "entropy_avail"
+  command: check_mk -vP install /usr/src/entropy_avail-1.0.mkp
+
+- name: Download check_mk server plugin "apt"
+  get_url: 
+    url: https://mathias-kettner.de/check_mk_exchange_download.php?HTML=yes&file=apt-2.8.0.mkp
+    dest: /usr/src/apt-2.8.0.mkp
+    checksum: md5:f2fa2718a1621b8d6d0df7bca5e7e8b2
+
+- name: Install check_mk server plugin "apt"
+  command: check_mk -vP install /usr/src/apt-2.8.0.mkp
+
+#- name: Download check_mk server plugin "isc_bind9"
+#  get_url: 
+#    url: https://mathias-kettner.de/check_mk_exchange_download.php?HTML=yes&file=isc_bind9-1.0.mkp
+#    dest: /usr/src/isc_bind9-1.0.mkp
+#    checksum: md5:c5463dc35b3e18af910356c223b5c429
+
+#- name: Install check_mk server plugin "isc_bind9"
+#  command: check_mk -vP install /usr/src/isc_bind9-1.0.mkp
+
+#- name: Fix naming issue of isc_bind9 plugin
+#  file: 
+#    src: /usr/share/check_mk/checks/isc_bind9 
+#    dest: /usr/share/check_mk/checks/dns
+#    type: link

@@ -1,0 +1,25 @@
+---
+- name: Install xinetd and check-mk-agent
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - xinetd
+    - check-mk-agent
+
+- name: Deploy fileinfo.cfg
+  template: 
+    src: fileinfo.cfg.j2
+    dest: /etc/check_mk/fileinfo.cfg
+  when: check_mk_agent.fileinfo is defined
+
+- name: Deploy check_mk service configuration for xinetd
+  template:
+    src: check_mk.j2
+    dest: /etc/xinetd.d/check_mk
+  notify: Restart xinetd
+
+- name: Install check_mk agent plugins from monitoring node
+  synchronize: 
+    src: /usr/share/check_mk/agents/plugins/
+    dest: /usr/lib/check_mk_agent/plugins/
+    delete: yes
+  delegate_to: node08.ffniers.de

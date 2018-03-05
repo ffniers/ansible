@@ -1,0 +1,6 @@
+---
+- name: Reload configuration
+  command: check_mk -O
+
+- name: Rebuild inventory
+  command: check_mk -II

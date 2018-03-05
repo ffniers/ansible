@@ -1,0 +1,19 @@
+---
+- name: Download GitLab repository install script
+  get_url: 
+    url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh 
+    dest: /usr/src/gitlab.deb.sh 
+    mode: 0755 
+    validate_certs: no
+  when: ansible_os_family == "Debian"
+
+- name: Install GitLab repository
+  shell: /usr/src/gitlab.deb.sh
+  when: ansible_os_family == "Debian"
+
+- name: Install GitLab
+  apt: 
+    name: gitlab-ce 
+    state: latest
+  notify: Configure GitLab
+  when: ansible_os_family == "Debian"

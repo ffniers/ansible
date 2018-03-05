@@ -1,0 +1,7 @@
+---
+- name: Add Debian backports repository
+  apt_repository: 
+    repo: 'deb http://ftp.de.debian.org/debian jessie-backports main contrib non-free' 
+    state: present 
+    update_cache: yes
+  when: ansible_distribution == 'Debian'

@@ -1,0 +1,6 @@
+---
+- hosts: supernodes-dev
+  roles:
+    - debian-backports
+    - check-mk-server
+    - icinga

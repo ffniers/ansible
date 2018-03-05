@@ -1,0 +1,96 @@
+---
+- name: Install icinga
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - apache2
+    - icinga
+    - nagios-plugins-contrib
+    - pnp4nagios-web
+    - pnp4nagios-web-config-icinga
+
+- name: Deploy main configuration files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/icinga/{{ item }}"
+  with_items:
+    - cgi.cfg
+    - icinga.cfg
+    - commands.cfg
+
+#- template:
+#    src: "{{ item }}.j2"
+#    dest: "/etc/apache2/conf-available/{{ item }}"
+#  with_items:
+#    - pnp4nagios.conf
+#  notify: Restart apache2
+
+- name: Enable NPCD
+  lineinfile: 
+    dest: /etc/default/npcd
+    regexp: ^RUN=
+    line: RUN="yes"
+  notify: Start npcd
+
+- name: Deploy objects
+  template:
+    src: "objects/{{ item }}.j2"
+    dest: "/etc/icinga/objects/{{ item }}"
+  with_items:
+    - contacts.cfg
+    - timeperiods.cfg
+  notify: Restart icinga
+
+- name: Remove default Icinga object config files
+  file:
+    path: "/etc/icinga/objects/{{ item }}"
+    state: absent
+  with_items:
+    - contacts_icinga.cfg
+    - timeperiods_icinga.cfg
+    - services_icinga.cfg
+    - localhost_icinga.cfg
+    - hostgroups_icinga.cfg
+    - extinfo_icinga.cfg
+    - generic-host_icinga.cfg
+    - generic-service_icinga.cfg
+  notify: Restart icinga
+
+- name: Set permission on /var/lib/icinga/rw/icinga.cmd
+  file:
+    path: /var/lib/icinga/rw
+    owner: nagios
+    group: www-data
+    mode: 0750
+
+- name: Add user www-data to group nagios
+  user:
+    name: www-data
+    groups: nagios
+    append: yes
+  notify: Restart apache2
+
+- name: Make sure /usr/local/lib/nagios/plugins exists
+  file: 
+    path: /usr/local/lib/nagios/plugins 
+    state: directory
+
+- name: Deploy custom nagios-plugins
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/lib/nagios/plugins/{{ item | basename }}"
+    mode: 0755
+  with_fileglob:
+    - nagios-plugins/*
+  notify: Restart icinga
+
+- name: Install dependencies for check plugins
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600
+  with_items:
+    - libnet-dns-perl
+    - libnet-libidn-perl
+    - libarray-compare-perl
+    - libmail-imapclient-perl
+    - python3
+    - python3-spf
+    - python-spf
+    - python-pymssql

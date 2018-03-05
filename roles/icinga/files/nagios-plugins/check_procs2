@@ -1,0 +1,116 @@
+#!/usr/bin/perl -w
+#
+# This Nagios plug-in checks the existence of processes
+#
+# check_procs2 <process name> <relation> <number> ...
+#
+# where <relation> can be
+#	eq		equal
+#	gt		greater than
+#	ge		greater equal
+#	lt		less than
+#	le		less equal
+#
+# Example:
+#	check_procs2 sendmail gt 2
+#
+# Michael Hocke, NYU, 6/16/2006
+
+use strict;
+
+my $ME = substr ("/usr/bin/perl -w $0 " . join (" ", @ARGV), 0, 79);
+my $USAGE = "$0: <process name> <relation> <number> [and] ...\n";
+
+# parse command line and store rules
+my %rules;
+
+if ($#ARGV == -1) {
+  print $USAGE;
+  exit 3;
+}
+
+my $parm = 0;
+while ($parm <= $#ARGV) {
+  if ($ARGV[$parm] eq "and") {
+    if ($parm == 0 or $parm == $#ARGV) {
+      print "$0: dangling 'and'\n";
+      exit 3;
+    }
+    $parm ++;
+  } elsif ($ARGV[$parm] eq "or") {
+    print "$0: 'or' operator not implemented (yet)\n";
+    exit 3;
+  } elsif ($parm + 2 > $#ARGV) {
+    print "$0: incomplete expression\n";
+    exit 3;
+  } else {
+    my ($crit_level, $warn_level) = split /:/, $ARGV[$parm + 2];
+    $rules{$ARGV[$parm]} = [$ARGV[$parm + 1], $crit_level, $warn_level, 0];
+    $parm += 3;
+  }
+}
+
+# get content of process table and match process names
+my $proc_no = 0;
+open PS, "/usr/bin/ps -e -o comm |";
+my $skip_header = <PS>;
+while (<PS>) {
+  chomp;
+  $proc_no ++;
+  next if ($_ eq $ME);
+  for my $pattern (keys %rules) {
+    if (/$pattern/) {
+      #print "MATCH ($pattern) $_";
+      $rules{$pattern}[3] ++;
+    }
+  }
+}
+close PS;
+
+# go through all rules and see if all conditions are met
+sub add_result {
+  my ($met, $rule, $want, $is, $prev_result) = @_;
+  my $str = "";
+  if (not $met) {
+    $str .= ", " if ($prev_result);
+    $str .= "$rule: $is/$want";
+  }
+  return $str;
+}
+
+my $crit_result = "";
+my $warn_result = "";
+for my $rule (keys %rules) {
+  my $op = $rules{$rule}->[0];
+  my $crit_want = $rules{$rule}->[1];
+  my $warn_want = $rules{$rule}->[2];
+  my $is = $rules{$rule}->[3];
+  if ($op eq "eq") {
+    $crit_result .= add_result ($is == $crit_want, $rule, $crit_want, $is, $crit_result) if (defined $crit_want);
+    $warn_result .= add_result ($is == $warn_want, $rule, $warn_want, $is, $warn_result) if (defined $warn_want);
+  } elsif ($op eq "ge") {
+    $crit_result .= add_result ($is >= $crit_want, $rule, $crit_want, $is, $crit_result) if (defined $crit_want);
+    $warn_result .= add_result ($is >= $warn_want, $rule, $warn_want, $is, $warn_result) if (defined $warn_want);
+  } elsif ($op eq "gt") {
+    $crit_result .= add_result ($is > $crit_want, $rule, $crit_want, $is, $crit_result) if (defined $crit_want);
+    $warn_result .= add_result ($is > $warn_want, $rule, $warn_want, $is, $warn_result) if (defined $warn_want);
+  } elsif ($op eq "le") {
+    $crit_result .= add_result ($is <= $crit_want, $rule, $crit_want, $is, $crit_result) if (defined $crit_want);
+    $warn_result .= add_result ($is <= $warn_want, $rule, $warn_want, $is, $warn_result) if (defined $warn_want);
+  } elsif ($op eq "lt") {
+    $crit_result .= add_result ($is < $crit_want, $rule, $crit_want, $is, $crit_result) if (defined $crit_want);
+    $warn_result .= add_result ($is < $warn_want, $rule, $warn_want, $is, $warn_result) if (defined $warn_want);
+  }
+}
+
+# return result
+if ($crit_result) {
+  print "PROCS CRITICAL: $proc_no processes - $crit_result\n";
+  exit 2;
+} elsif ($warn_result) {
+  print "PROCS WARNING: $proc_no processes - $warn_result\n";
+  exit 1;
+} else {
+  print "PROCS OK: $proc_no processes - no problems found\n";
+  exit 0;
+}
