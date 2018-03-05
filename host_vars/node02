@@ -6,10 +6,8 @@ l2tp:
       sessions:
       - name: niers
         id: 1
-
       - name: mg
         id: 2
-
       - name: mo
         id: 3
     - name: node03
@@ -17,10 +15,8 @@ l2tp:
       sessions:
       - name: niers
         id: 1
-
       - name: mg
         id: 2
-
       - name: mo
         id: 3
     - name: node04
@@ -28,20 +24,34 @@ l2tp:
       sessions:
       - name: niers
         id: 1
-
       - name: mg
         id: 2
-
       - name: mo
         id: 3
-    - name: node05
+    - name: services
       id: 5
       sessions:
       - name: niers
         id: 1
-
       - name: mg
         id: 2
-
+      - name: mo
+        id: 3
+    - name: services2
+      id: 6
+      sessions:
+      - name: niers
+        id: 1
+      - name: mg
+        id: 2
+      - name: mo
+        id: 3
+    - name: web
+      id: 7
+      sessions:
+      - name: niers
+        id: 1
+      - name: mg
+        id: 2
       - name: mo
         id: 3

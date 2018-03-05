@@ -8,7 +8,6 @@
 - name: Deploy selfmon.py and freifunk-l2tp 
   hosts: all
   roles:
-    - selfmon
     - l2tp
   
 
