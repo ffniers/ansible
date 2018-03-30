@@ -17,6 +17,7 @@
 - name: figlet name
   command: /usr/bin/figlet -c -w 80 {{ansible_hostname}}
   register: figlethost
+  check_mode: no
 
 - name: make sure /etc/motd is a symlink
   file:
